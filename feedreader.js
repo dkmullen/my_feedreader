@@ -22,7 +22,10 @@ $(function() {
          * page?
          */
         it('are defined', function() {
+			//toBeDefined is a jasmine matcher that compares the tested object
+			//to a void
             expect(allFeeds).toBeDefined();
+			//toBe is a jasmine matcher that performs a triple = comparison
             expect(allFeeds.length).not.toBe(0);
         });
 
@@ -32,6 +35,7 @@ $(function() {
          * and that the URL is not empty.
          */
 		it('URLs are defined', function() {
+			//loop thru the feeds, check that each is defined and not empty
 			for (i = 0; i < allFeeds.length; i++) {
 				expect(allFeeds[i].url).toBeDefined();
 				expect(allFeeds[i].url.length).not.toBe(0);
@@ -59,6 +63,8 @@ $(function() {
          * the CSS to determine how we're performing the
          * hiding/showing of the menu element.
          */
+		 
+		 //check that the menu-hidden class is operative on page load
 		it('is hidden by default', function() {
 			expect(document.body.className).toBe('menu-hidden');
         });
@@ -87,6 +93,9 @@ $(function() {
          * Remember, loadFeed() is asynchronous so this test will require
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
+		 
+		 //Before the test begins, load feed (Udacity Blog, in this case), then
+		 //run the test, which calls back to this function when done
 		beforeEach(function(done) {
 			loadFeed(0, done);
 		});
@@ -94,7 +103,6 @@ $(function() {
 			//look for the class 'entry' in the DOM feed container, check to
 			//see that it isn't empty (ie, of zero length)
 			expect($('.entry').length).toBeGreaterThan(0);
-			//console.log($('.entry').length);
 			done();
 		});
 
