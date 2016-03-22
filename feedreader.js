@@ -1,50 +1,31 @@
 /* feedreader.js
- *
- * This is the spec file that Jasmine will read and contains
- * all of the tests that will be run against your application.
- */
 
 /* We're placing all of our tests within the $() function,
  * since some of these tests may require DOM elements. We want
  * to ensure they don't run until the DOM is ready.
  */
 $(function() {
-    /* This is our first test suite - a test suite just contains
-    * a related set of tests. This suite is all about the RSS
-    * feeds definitions, the allFeeds variable in our application.
-    */
+    /* A suite that checks the RSS feeds definitions (the allFeeds variable) */
     describe('RSS Feeds', function() {
-        /* This is our first test - it tests to make sure that the
-         * allFeeds variable has been defined and that it is not
-         * empty. Experiment with this before you get started on
-         * the rest of this project. What happens when you change
-         * allFeeds in app.js to be an empty array and refresh the
-         * page?
-         */
-        it('are defined', function() {
-			//toBeDefined is a jasmine matcher that compares the tested object
-			//to a void
+
+		it('are defined', function() {
+			/* toBeDefined is a jasmine matcher that compares the tested object
+			 * to a void */
             expect(allFeeds).toBeDefined();
 			//toBe is a jasmine matcher that performs a triple = comparison
             expect(allFeeds.length).not.toBe(0);
         });
 
-
-        /* TODO: Write a test that loops through each feed
-         * in the allFeeds object and ensures it has a URL defined
-         * and that the URL is not empty.
-         */
+		/* Loop thru the feeds, check that each is defined and not empty */
 		it('URLs are defined', function() {
-			//loop thru the feeds, check that each is defined and not empty
 			for (i = 0; i < allFeeds.length; i++) {
 				expect(allFeeds[i].url).toBeDefined();
 				expect(allFeeds[i].url.length).not.toBe(0);
 			}
         });
 
-        /* TODO: Write a test that loops through each feed
-         * in the allFeeds object and ensures it has a name defined
-         * and that the name is not empty.
+        /* Loop through each feed, ensure it has a name defined and that 
+		 * the name is not empty.
          */
 		it('names are defined', function() {
 			for (i = 0; i < allFeeds.length; i++) {
@@ -55,39 +36,34 @@ $(function() {
     });
 
 
-    /* TODO: Write a new test suite named "The menu" */
+    /* A suite dealing with the menu */
 	describe('The menu', function() {
 
-        /* TODO: Write a test that ensures the menu element is
-         * hidden by default. You'll have to analyze the HTML and
-         * the CSS to determine how we're performing the
-         * hiding/showing of the menu element.
-         */
-		 
-		 //check that the menu-hidden class is operative on page load
+		/* Check that the menu-hidden class is operative on page load - ie, that
+		 * the menu is hidden by default */
 		it('is hidden by default', function() {
-			expect(document.body.className).toBe('menu-hidden');
+			/* toContain is a Jasmine matcher that allows the body elem to
+			 * contain other classes as long as 'menu-hidden is included
+			 * (or NOT included, when negated by 'not', below) */
+			expect(document.body.className).toContain('menu-hidden');
         });
 
-         /* TODO: Write a test that ensures the menu changes
-          * visibility when the menu icon is clicked. This test
-          * should have two expectations: does the menu display when
-          * clicked and does it hide when clicked again.
-          */
+        /* Check that the menu changes visibility when the menu icon is clicked. 
+		 * Ie, that the menu displays when clicked, hides when clicked again. */
 		it('changes visibility on click', function() {
 			//Simulate a click, check to see that 'menu-hidden' class disappears
 			$('.menu-icon-link').click();				
-			expect(document.body.className).toBe('');
+			expect(document.body.className).not.toContain('menu-hidden');
 			
 			//Simulate a click, check to see that 'menu-hidden' class reappears
-			$('.menu-icon-link').click()				
-			expect(document.body.className).toBe('menu-hidden');
-			})
+			$('.menu-icon-link').click();			
+			expect(document.body.className).toContain('menu-hidden');
+			});
 	});
 
-    /* TODO: Write a new test suite named "Initial Entries" */
+    /* A suite dealing with the initial entries of a feed */
 	describe('Initial Entries', function() {
-        /* TODO: Write a test that ensures when the loadFeed
+        /* Write a test that ensures when the loadFeed
          * function is called and completes its work, there is at least
          * a single .entry element within the .feed container.
          * Remember, loadFeed() is asynchronous so this test will require
@@ -99,42 +75,44 @@ $(function() {
 		beforeEach(function(done) {
 			loadFeed(0, done);
 		});
-		it('should contain at least one entry', function(done) {
+		it('should contain at least one entry', function() {
 			//look for the class 'entry' in the DOM feed container, check to
 			//see that it isn't empty (ie, of zero length)
 			expect($('.entry').length).toBeGreaterThan(0);
-			done();
 		});
 
 	});	 
-    /* TODO: Write a new test suite named "New Feed Selection" */
-	describe('New Feed Selection', function() {
-		/* TODO: Write a test that ensures when a new feed is loaded
-         * by the loadFeed function that the content actually changes.
-         * Remember, loadFeed() is asynchronous.
-         */
-		var feedTitle = $('.header-title').html(); //header-title == 'Feeds', from html
-		
+	
+    /* A suite that checks for changes when a new feed is selected */
+	describe('New Feed Selection', function () {
+		var feedContent;
+
+		/* Call the Udacity blog feed, set feedContent to the contents of
+		 * the main feed container (ie, the RSS results) */
 		beforeEach(function(done) {
-			/* load feed #1, CSS Tricks in this case. When this loads, header-title
-			 * changes to 'CSS Tricks' and then the comparison at the bottom is run.
-			 */
-			loadFeed(1, done);
+			loadFeed(0, function() {
+				/* Waits till after load to set this variable so we don't 
+				 * retrieve data from previous test suite. */
+				feedContent = $('.feed').html();
+				done();
+			});
 		});
 		
-		/* This simply changes the feed back to the default, 'Udacity Blog 
-		 * after the test runs */
-		afterEach(function(done) {
+		/* This simply changes the feed back to the default, 'Udacity Blog' 
+		 * after the test runs. afterAll runs last in this suite, even with 
+		 * multiple 'it' specs */
+		afterAll(function(done) {
 			loadFeed(0, done);
 		});
-		
-		/* So, the test simply makes sure that header-title changes from the 
-		 * default, which is set in the html, to something else, presumably
-		 * from a feed */
-		it('should change when new feed loads', function(done) {
-			expect($('.header-title').html()).not.toBe(feedTitle);
-			done();
+
+		it('content should change when a new feed is loaded', function(done) {
+			/* Loads a new feed, compares it to the previous one. Note that
+			* changing this feed to match previous one causes the test to
+			* fail, as expected. */
+			loadFeed(1, function() {
+				expect($('.feed').html() !== feedContent).toBeTruthy();
+				done();
+			});
 		});
-		
-	});	 
+	});
 }());
